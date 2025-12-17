@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#bb86fc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3700b3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#121212" />
+  <rect x="64" y="64" width="384" height="384" rx="64" stroke="url(#grad)" stroke-width="32" fill="none" opacity="0.5"/>
+  <path d="M360 152 L152 360 M360 360 L152 152" stroke="url(#grad)" stroke-width="48" stroke-linecap="round" />
+  <path d="M256 180 L256 332 M180 256 L332 256" stroke="#ffffff" stroke-width="24" stroke-linecap="round" />
+  <!-- Shrink Arrows -->
+  <path d="M100 256 L150 256 M412 256 L362 256 M256 100 L256 150 M256 412 L256 362" stroke="url(#grad)" stroke-width="32" stroke-linecap="round"/>
+</svg>
