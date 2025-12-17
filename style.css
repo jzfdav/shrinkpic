@@ -137,8 +137,12 @@ input[type="range"]::-webkit-slider-thumb {
 .button-group { display: flex; gap: 10px; }
 .button-group .btn { flex: 1; }
 
-.footer-controls { display: flex; justify-content: flex-end; }
-.btn-icon { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; }
+.primary-controls { display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 10px; }
+.primary-controls #selectBtn { flex: 1; }
+.icon-group { display: flex; gap: 4px; }
+
+.btn-icon { background: none; border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-secondary); cursor: pointer; padding: 12px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
+.btn-icon:active { background-color: var(--bg-color); }
 
 /* Modal */
 .modal {
