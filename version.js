@@ -1,0 +1,1 @@
+const VERSION = 'shrinkpic-v1.1';

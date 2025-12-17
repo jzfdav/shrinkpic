@@ -5,6 +5,7 @@
     --text-primary: #ffffff;
     --text-secondary: #a0a0a0;
     --accent-color: #bb86fc;
+    --btn-text-color: #000000;
     --accent-hover: #9965f4;
     --border-color: #333;
     --modal-bg: rgba(0,0,0,0.8);
@@ -15,13 +16,14 @@ body.light-mode {
     --surface-color: #ffffff;
     --text-primary: #121212;
     --text-secondary: #555555;
-    --accent-color: #3b82f6;
-    --accent-hover: #2563eb;
+    --accent-color: #2563eb;
+    --btn-text-color: #ffffff;
+    --accent-hover: #1d4ed8;
     --border-color: #e5e7eb;
     --modal-bg: rgba(0,0,0,0.5);
 }
 
-* { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
     margin: 0;
@@ -101,6 +103,7 @@ input[type="range"] {
     border-radius: 3px;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -128,7 +131,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .btn:active { transform: scale(0.98); }
 .btn-large { width: 100%; }
-.btn-primary { background-color: var(--accent-color); color: #fff; }
+.btn-primary { background-color: var(--accent-color); color: var(--btn-text-color); }
 .btn-secondary { background-color: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); }
 
 .button-group { display: flex; gap: 10px; }
