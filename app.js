@@ -26,7 +26,8 @@ const els = {
     closeSettings: document.getElementById('closeSettings'),
     darkModeToggle: document.getElementById('darkModeToggle'),
     modeRadios: document.getElementsByName('compMode'),
-    formatRadios: document.getElementsByName('format')
+    formatRadios: document.getElementsByName('format'),
+    versionDisplay: document.getElementById('versionDisplay')
 };
 
 // --- State ---
@@ -37,6 +38,11 @@ let currentBlob = null;
 // Check Web Share API support
 if (navigator.share) {
     els.shareBtn.classList.remove('hidden');
+}
+
+// Set Version
+if (typeof VERSION !== 'undefined' && els.versionDisplay) {
+    els.versionDisplay.textContent = VERSION;
 }
 
 // --- Event Listeners ---
