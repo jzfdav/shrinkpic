@@ -22,17 +22,20 @@ const els = {
     downloadBtn: document.getElementById('downloadBtn'),
     shareBtn: document.getElementById('shareBtn'),
     settingsBtn: document.getElementById('settingsBtn'),
+    installBtn: document.getElementById('installBtn'),
     settingsModal: document.getElementById('settingsModal'),
     closeSettings: document.getElementById('closeSettings'),
     darkModeToggle: document.getElementById('darkModeToggle'),
     modeRadios: document.getElementsByName('compMode'),
     formatRadios: document.getElementsByName('format'),
-    versionDisplay: document.getElementById('versionDisplay')
+    versionDisplay: document.getElementById('versionDisplay'),
+    iosGuide: document.getElementById('iosGuide')
 };
 
 // --- State ---
 let currentFile = null;
 let currentBlob = null;
+let deferredPrompt = null;
 
 // --- Initialization ---
 // Check Web Share API support
@@ -44,6 +47,32 @@ if (navigator.share) {
 if (typeof VERSION !== 'undefined' && els.versionDisplay) {
     els.versionDisplay.textContent = VERSION;
 }
+
+// Detect iOS for Install Guide
+const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+if (isIos && els.iosGuide) {
+    els.iosGuide.classList.remove('hidden');
+}
+
+// --- PWA Install Logic ---
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    els.installBtn.classList.remove('hidden');
+});
+
+els.installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    els.installBtn.classList.add('hidden');
+});
+
+window.addEventListener('appinstalled', () => {
+    els.installBtn.classList.add('hidden');
+    deferredPrompt = null;
+});
 
 // --- Event Listeners ---
 
