@@ -14,18 +14,19 @@ A lightweight, privacy-focused Progressive Web App (PWA) to compress images offl
 
 1. Open the app.
 2. Drag & drop an image or paste from clipboard.
-3. Adjust the target size slider.
+3. Adjust the target size slider and select output format.
 4. Download or Share the compressed result.
 
-## Development
+## Installation
 
-To run locally:
+**On Mobile (iOS/Android):**
+1. Open the app in your browser.
+2. Tap the "Share" button (iOS) or Menu (Android).
+3. Select "Add to Home Screen".
 
-```bash
-python3 -m http.server
-```
-
-Then open `http://localhost:8000`.
+**On Desktop:**
+1. Look for the install icon in the address bar.
+2. Click to install as a standalone app.
 
 ## License
 
