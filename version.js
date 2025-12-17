@@ -1,1 +1,1 @@
-const VERSION = 'shrinkpic-v1.2';
+const VERSION = 'shrinkpic-v1.3';
