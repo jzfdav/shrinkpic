@@ -77,7 +77,7 @@ describe("formatSize", () => {
 describe("App", () => {
   it("renders the main UI", () => {
     render(<App />);
-    expect(screen.getByText("JzfShrinkPic")).toBeInTheDocument();
+    expect(screen.getByText("ShrinkPic")).toBeInTheDocument();
     expect(screen.getByText("Select Image")).toBeInTheDocument();
   });
 
