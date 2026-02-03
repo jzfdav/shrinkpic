@@ -69,7 +69,7 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const worker = new Worker(`${import.meta.env.BASE_URL}worker.js`);
+    const worker = new Worker(new URL("./worker.js", import.meta.url), { type: "classic" });
     worker.onerror = (event) => {
       console.error("Worker Error:", event);
       setIsLoading(false);
@@ -127,8 +127,9 @@ export function App() {
       const items = event.clipboardData?.items;
       if (!items) return;
       for (let i = 0; i < items.length; i += 1) {
-        if (items[i].type.includes("image")) {
-          const file = items[i].getAsFile();
+        const item = items[i];
+        if (item && item.type.includes("image")) {
+          const file = item.getAsFile();
           if (file) handleFile(file);
           break;
         }
@@ -323,7 +324,7 @@ export function App() {
           onDrop={(event) => {
             event.preventDefault();
             setIsDragging(false);
-            const file = event.dataTransfer.files[0];
+            const file = event.dataTransfer?.files?.[0] ?? null;
             if (file) handleFile(file);
           }}
         >
