@@ -51,6 +51,7 @@ export function App() {
   const [compMode, setCompMode] = useState<CompressionMode>("quality");
   const [stats, setStats] = useState<CompressionResult | null>(null);
   const [installAvailable, setInstallAvailable] = useState(false);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [canShare, setCanShare] = useState(false);
@@ -85,11 +86,13 @@ export function App() {
       event.preventDefault();
       installPromptRef.current = event as BeforeInstallPromptEvent;
       setInstallAvailable(true);
+      setShowInstallBanner(!localStorage.getItem("installBannerDismissed"));
     };
 
     const handleInstalled = () => {
       installPromptRef.current = null;
       setInstallAvailable(false);
+      setShowInstallBanner(false);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
@@ -222,6 +225,7 @@ export function App() {
     await installPromptRef.current.userChoice;
     installPromptRef.current = null;
     setInstallAvailable(false);
+    setShowInstallBanner(false);
   };
 
   const handleShare = async () => {
@@ -243,6 +247,33 @@ export function App() {
 
   return (
     <div className="relative flex min-h-screen flex-col gap-8 px-4 pb-14 pt-10 md:px-10">
+      {showInstallBanner && installAvailable && !isIos && (
+        <div className="mx-auto w-full max-w-5xl rounded-xl border border-border bg-card/90 p-4 shadow-sm backdrop-blur">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-foreground">Install JzfShrinkPic</div>
+              <div className="text-xs text-muted-foreground">
+                Get one-tap access and offline support by installing this app.
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={handleInstall}>
+                Install
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  localStorage.setItem("installBannerDismissed", "true");
+                  setShowInstallBanner(false);
+                }}
+              >
+                Not now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       <header className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
