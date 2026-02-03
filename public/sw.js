@@ -1,5 +1,12 @@
 const CACHE_NAME = "shrinkpic-v1.3.2";
-const CORE_ASSETS = ["/", "/index.html", "/manifest.json", "/icon.svg", "/worker.js"];
+const baseUrl = new URL(self.registration.scope);
+const CORE_ASSETS = [
+  new URL(".", baseUrl).pathname,
+  new URL("index.html", baseUrl).pathname,
+  new URL("manifest.json", baseUrl).pathname,
+  new URL("icon.svg", baseUrl).pathname,
+  new URL("worker.js", baseUrl).pathname,
+];
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -24,7 +31,12 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
       return fetch(event.request).then((response) => {
-        if (response && response.status === 200 && event.request.url.startsWith(self.location.origin)) {
+        if (
+          response &&
+          response.status === 200 &&
+          event.request.url.startsWith(self.location.origin) &&
+          event.request.url.startsWith(baseUrl.origin + baseUrl.pathname)
+        ) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
         }

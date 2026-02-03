@@ -63,12 +63,12 @@ export function App() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(console.error);
+      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(console.error);
     }
   }, []);
 
   useEffect(() => {
-    const worker = new Worker("/worker.js");
+    const worker = new Worker(`${import.meta.env.BASE_URL}worker.js`);
     worker.onerror = (event) => {
       console.error("Worker Error:", event);
       setIsLoading(false);

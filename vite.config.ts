@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  base: "/shrinkpic/",
   plugins: [preact()],
   server: {
     host: true,
