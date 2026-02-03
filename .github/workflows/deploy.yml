@@ -27,10 +27,10 @@ jobs:
           node-version: "22"
           cache: "pnpm"
 
-      - name: Enable corepack
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.28.2 --activate
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
