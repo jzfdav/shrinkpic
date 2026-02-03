@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   base: "/shrinkpic/",
-  plugins: [preact()],
+  plugins: preact(),
   server: {
     host: true,
   },
