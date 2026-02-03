@@ -3,11 +3,15 @@
   "short_name": "JzfShrinkPic",
   "start_url": "./",
   "id": "./",
+  "scope": "./",
   "description": "A privacy-focused offline image compressor PWA.",
   "display": "standalone",
+  "display_override": ["standalone", "browser"],
   "background_color": "#121212",
   "theme_color": "#121212",
   "orientation": "portrait",
+  "categories": ["productivity", "utilities", "photo"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "./icon.svg",
