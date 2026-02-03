@@ -1,5 +1,14 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+
+if [ -s "$HOME/.nvm/nvm.sh" ]; then
+  # shellcheck disable=SC1090
+  . "$HOME/.nvm/nvm.sh"
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "Node.js not found in PATH. Install Node or ensure nvm is loaded." >&2
+  exit 1
+fi
 
 pnpm test
 pnpm run build
