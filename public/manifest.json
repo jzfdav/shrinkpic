@@ -1,10 +1,10 @@
 {
-  "name": "JzfShrinkPic",
-  "short_name": "JzfShrinkPic",
+  "name": "ShrinkPic",
+  "short_name": "ShrinkPic",
   "start_url": "./",
   "id": "./",
   "scope": "./",
-  "description": "A privacy-focused offline image compressor PWA.",
+  "description": "A privacy-focused offline image compressor.",
   "display": "standalone",
   "display_override": ["standalone", "browser"],
   "background_color": "#121212",

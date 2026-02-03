@@ -1,4 +1,4 @@
-# JzfShrinkPic
+# ShrinkPic
 
 A lightweight, privacy-focused Progressive Web App (PWA) to compress images offline.
 

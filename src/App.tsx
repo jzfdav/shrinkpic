@@ -237,7 +237,7 @@ export function App() {
       await navigator.share({
         files: [file],
         title: "Compressed Image",
-        text: `Here is the compressed ${extension.toUpperCase()} image from JzfShrinkPic.`,
+        text: `Here is the compressed ${extension.toUpperCase()} image from ShrinkPic.`,
       });
     } catch (error) {
       console.log("Share failed:", error);
@@ -252,7 +252,7 @@ export function App() {
         <div className="mx-auto w-full max-w-5xl rounded-xl border border-border bg-card/90 p-4 shadow-sm backdrop-blur">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-foreground">Install JzfShrinkPic</div>
+              <div className="text-sm font-semibold text-foreground">Install ShrinkPic</div>
               <div className="text-xs text-muted-foreground">
                 Get one-tap access and offline support by installing this app.
               </div>
@@ -283,8 +283,8 @@ export function App() {
             </div>
             <span>Privacy focused. Offline by default.</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">JzfShrinkPic</h1>
-          <p className="max-w-xl text-sm text-muted-foreground md:text-base">
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">ShrinkPic</h1>
+          <p className="max-w-xl text-xs text-muted-foreground md:text-sm">
             Drop, paste, or select an image and we will compress it locally with a clean shadcn-preact UI.
           </p>
         </div>
@@ -350,8 +350,8 @@ export function App() {
                 <div className="flex size-14 items-center justify-center rounded-full border border-border/60 bg-background/40">
                   <Upload className="size-6" />
                 </div>
-                <div className="text-base font-medium text-foreground">Drop or paste an image</div>
-                <p className="max-w-sm text-sm text-muted-foreground">
+                <div className="text-sm font-medium text-foreground">Drop or paste an image</div>
+                <p className="max-w-sm text-xs text-muted-foreground">
                   We will never upload your files. Everything stays on-device.
                 </p>
               </div>
@@ -561,7 +561,7 @@ export function App() {
               </div>
               <Separator />
               <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="font-medium text-foreground">About JzfShrinkPic</div>
+                <div className="font-medium text-foreground">About ShrinkPic</div>
                 <ul className="list-none space-y-1">
                   <li>100% offline, client-side compression</li>
                   <li>Metadata removed automatically</li>
