@@ -69,7 +69,7 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const worker = new Worker(new URL("./worker.js", import.meta.url), { type: "classic" });
+    const worker = new Worker(`${import.meta.env.BASE_URL}worker.js`, { type: "classic" });
     worker.onerror = (event) => {
       console.error("Worker Error:", event);
       setIsLoading(false);
