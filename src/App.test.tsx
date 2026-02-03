@@ -37,10 +37,8 @@ class MockWorker {
 
 beforeEach(() => {
   vi.stubGlobal("Worker", MockWorker as unknown as typeof Worker);
-  vi.stubGlobal("URL", {
-    createObjectURL: vi.fn(() => "blob:mock"),
-    revokeObjectURL: vi.fn(),
-  });
+  vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
+  vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
 
   const serviceWorker = {
     register: vi.fn().mockResolvedValue(undefined),
