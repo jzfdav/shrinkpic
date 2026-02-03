@@ -1,140 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JzfShrinkPic</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#121212">
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-</head>
-<body>
-
-    <!-- Main App Container -->
-    <main class="app-container">
-        
-        <!-- Top Half: Visual Feedback / Drop Zone -->
-        <div id="previewArea" class="preview-area">
-            <div class="placeholder-content">
-                <div class="icon-large">↓</div>
-                <h1>Drop or Paste Image</h1>
-                <p class="subtext">Privacy Focused. Offline.</p>
-            </div>
-            <img id="imagePreview" class="hidden" alt="Preview">
-            <div id="loader" class="loader hidden"></div>
-        </div>
-
-        <!-- Bottom Half: Controls -->
-        <div class="controls-area">
-            
-            <!-- Info Bar (Size stats) -->
-            <div id="statsBar" class="stats-bar hidden">
-                <div class="stat">
-                    <span class="label">Original</span>
-                    <span class="value" id="origSize">0 KB</span>
-                    <span class="meta" id="origDim"></span>
-                </div>
-                <div class="arrow">→</div>
-                <div class="stat">
-                    <span class="label">New</span>
-                    <span class="value highlight" id="newSize">0 KB</span>
-                    <span class="meta" id="newDim"></span>
-                </div>
-            </div>
-
-            <!-- Slider Control -->
-            <div class="slider-container">
-                <div class="slider-header">
-                    <label for="sizeLimit">Max Size</label>
-                    <span id="sizeValue">100 KB</span>
-                </div>
-                <input type="range" id="sizeLimit" min="20" max="500" step="10" value="100">
-            </div>
-
-            <!-- Primary Actions -->
-            <div class="action-buttons">
-                <input type="file" id="fileInput" accept="image/*" hidden>
-                
-                <div class="primary-controls">
-                    <!-- Initial State Button -->
-                    <button id="selectBtn" class="btn btn-primary">
-                        Select Image
-                    </button>
-
-                    <div class="icon-group">
-                        <button id="installBtn" class="btn-icon hidden" aria-label="Install App">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                        </button>
-                        <button id="settingsBtn" class="btn-icon" aria-label="Settings">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Result State Buttons (Hidden initially) -->
-                <div id="resultButtons" class="button-group hidden">
-                    <button id="shareBtn" class="btn btn-secondary hidden">Share</button>
-                    <a id="downloadBtn" class="btn btn-primary" download="jzfshrinkpic-image.jpg">Download</a>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Settings</h3>
-                <button id="closeSettings" class="btn-icon" aria-label="Close Settings">✕</button>
-            </div>
-            
-            <div class="setting-item">
-                <label for="darkModeToggle">Dark Mode</label>
-                <input type="checkbox" id="darkModeToggle" checked>
-            </div>
-
-            <div class="setting-item">
-                <label>Format</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="format" value="image/jpeg" checked> JPG</label>
-                    <label><input type="radio" name="format" value="image/png"> PNG</label>
-                    <label><input type="radio" name="format" value="image/avif"> AVIF</label>
-                </div>
-            </div>
-            
-            <div class="setting-item">
-                <label>Priority</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="compMode" value="quality" checked> Quality</label>
-                    <label><input type="radio" name="compMode" value="resolution"> Resolution</label>
-                </div>
-            </div>
-
-            <div class="about-section">
-                <h4>About JzfShrinkPic</h4>
-                <p id="versionDisplay">Version 1.0.0</p>
-                <ul>
-                    <li>✅ 100% Offline (Client-side)</li>
-                    <li>✅ Metadata (EXIF) Stripped automatically</li>
-                    <li>✅ No Server Uploads</li>
-                </ul>
-                <div id="iosGuide" class="hidden" style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 10px;">
-                    <strong>Install on iOS:</strong><br>
-                    Tap Share <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> then "Add to Home Screen"
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="version.js"></script>
-    <script src="app.js"></script>
-</body>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#121212" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
 </html>
