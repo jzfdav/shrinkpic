@@ -37,8 +37,25 @@ class MockWorker {
 
 beforeEach(() => {
   vi.stubGlobal("Worker", MockWorker as unknown as typeof Worker);
-  vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
-  vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+  if (!("createObjectURL" in URL)) {
+    Object.defineProperty(URL, "createObjectURL", {
+      value: vi.fn(() => "blob:mock"),
+      configurable: true,
+      writable: true,
+    });
+  } else {
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
+  }
+
+  if (!("revokeObjectURL" in URL)) {
+    Object.defineProperty(URL, "revokeObjectURL", {
+      value: vi.fn(),
+      configurable: true,
+      writable: true,
+    });
+  } else {
+    vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+  }
 
   const serviceWorker = {
     register: vi.fn().mockResolvedValue(undefined),
