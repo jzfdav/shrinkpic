@@ -1,12 +1,12 @@
 // worker.js
 self.onmessage = async (e) => {
-    const { file, targetBytes, format, mode } = e.data;
+    const { file, targetBytes, format, mode, requestId } = e.data;
 
     try {
         const result = await compressToSize(file, targetBytes, format, mode);
-        self.postMessage({ success: true, ...result });
+        self.postMessage({ success: true, requestId, ...result });
     } catch (error) {
-        self.postMessage({ success: false, error: error.message });
+        self.postMessage({ success: false, requestId, error: error.message });
     }
 };
 

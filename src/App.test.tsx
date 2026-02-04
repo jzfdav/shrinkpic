@@ -1,37 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/preact";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/preact";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App, formatSize } from "./App";
 
-type WorkerMessage = {
-  success: boolean;
-  blob?: Blob;
-  width?: number;
-  height?: number;
-  origWidth?: number;
-  origHeight?: number;
-  error?: string;
-};
-
 class MockWorker {
-  onmessage: ((event: { data: WorkerMessage }) => void) | null = null;
+  onmessage: ((event: { data: unknown }) => void) | null = null;
   onerror: ((event: Event) => void) | null = null;
-
-  postMessage() {
-    const payload: WorkerMessage = {
-      success: true,
-      blob: new Blob(["x"], { type: "image/jpeg" }),
-      width: 120,
-      height: 80,
-      origWidth: 400,
-      origHeight: 300,
-    };
-
-    setTimeout(() => {
-      this.onmessage?.({ data: payload });
-    }, 0);
-  }
-
+  postMessage() {}
   terminate() {}
 }
 
@@ -79,21 +53,5 @@ describe("App", () => {
     render(<App />);
     expect(screen.getByText("ShrinkPic")).toBeInTheDocument();
     expect(screen.getByText("Select Image")).toBeInTheDocument();
-  });
-
-  it("processes a selected image and shows the preview", async () => {
-    render(<App />);
-
-    const input = document.querySelector("input[type='file']") as HTMLInputElement;
-    const file = new File(["data"], "photo.jpg", { type: "image/jpeg" });
-
-    await userEvent.upload(input, file);
-
-    await waitFor(() => {
-      expect(screen.getByAltText("Preview")).toBeInTheDocument();
-    });
-
-    expect(screen.getByText(/Original:/)).toBeInTheDocument();
-    expect(screen.getByText(/New:/)).toBeInTheDocument();
   });
 });

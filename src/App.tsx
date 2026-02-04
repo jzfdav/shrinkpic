@@ -23,18 +23,13 @@ import {
   Sun,
   Upload,
 } from "lucide-preact";
+import {
+  CompressionMode,
+  CompressionResult,
+  createCompressionClient,
+} from "./compressionClient";
 
 const VERSION = "shrinkpic-v1.3.2";
-
-type CompressionMode = "quality" | "resolution";
-
-type CompressionResult = {
-  blob: Blob;
-  width: number;
-  height: number;
-  origWidth: number;
-  origHeight: number;
-};
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -60,7 +55,9 @@ export function App() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const workerRef = useRef<Worker | null>(null);
+  const compressionClientRef = useRef<ReturnType<typeof createCompressionClient> | null>(null);
   const installPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
+  const latestRequestIdRef = useRef(0);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -70,14 +67,17 @@ export function App() {
 
   useEffect(() => {
     const worker = new Worker(`${import.meta.env.BASE_URL}worker.js`, { type: "classic" });
-    worker.onerror = (event) => {
+    const client = createCompressionClient(worker, (event) => {
       console.error("Worker Error:", event);
       setIsLoading(false);
-    };
+    });
     workerRef.current = worker;
+    compressionClientRef.current = client;
     return () => {
+      client.dispose();
       worker.terminate();
       workerRef.current = null;
+      compressionClientRef.current = null;
     };
   }, []);
 
@@ -173,8 +173,10 @@ export function App() {
 
   const processImage = async (file: File) => {
     setIsLoading(true);
+    const requestId = ++latestRequestIdRef.current;
     try {
-      const result = await compressToSize(file, targetSizeKB * 1024, format, compMode);
+      const result = await compressToSize(file, targetSizeKB * 1024, format, compMode, requestId);
+      if (requestId !== latestRequestIdRef.current) return;
       setCurrentBlob(result.blob);
       setStats(result);
       setPreviewUrl(URL.createObjectURL(result.blob));
@@ -189,34 +191,19 @@ export function App() {
     file: File,
     targetBytes: number,
     outputFormat: string,
-    mode: CompressionMode
+    mode: CompressionMode,
+    requestId: number
   ) => {
     return new Promise<CompressionResult>((resolve, reject) => {
-      const worker = workerRef.current;
-      if (!worker) {
+      const client = compressionClientRef.current;
+      if (!client) {
         reject(new Error("Compression worker unavailable."));
         return;
       }
-
-      worker.onmessage = (event) => {
-        const { success, error, blob, width, height, origWidth, origHeight } = event.data as {
-          success: boolean;
-          error?: string;
-          blob?: Blob;
-          width?: number;
-          height?: number;
-          origWidth?: number;
-          origHeight?: number;
-        };
-
-        if (success && blob && width && height && origWidth && origHeight) {
-          resolve({ blob, width, height, origWidth, origHeight });
-        } else {
-          reject(new Error(error || "Compression failed."));
-        }
-      };
-
-      worker.postMessage({ file, targetBytes, format: outputFormat, mode });
+      client
+        .compressToSize(file, targetBytes, outputFormat, mode, requestId)
+        .then(resolve)
+        .catch(reject);
     });
   };
 
@@ -452,7 +439,7 @@ export function App() {
                 )}
                 {previewUrl ? (
                   <Button asChild className="flex-1">
-                    <a href={previewUrl} download={`jzfshrinkpic-image.${downloadName}`}>
+                    <a href={previewUrl} download={`shrinkpic-image.${downloadName}`}>
                       <Download className="size-4" />
                       Download
                     </a>
