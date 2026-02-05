@@ -272,7 +272,7 @@ export function App() {
           </div>
           <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">ShrinkPic</h1>
           <p className="max-w-xl text-xs text-muted-foreground md:text-sm">
-            Drop, paste, or select an image and we will compress it locally with a clean shadcn-preact UI.
+            Compress images locally in seconds. No uploads.
           </p>
         </div>
         <div className="flex flex-col items-end gap-3">
@@ -339,7 +339,7 @@ export function App() {
                 </div>
                 <div className="text-sm font-medium text-foreground">Drop or paste an image</div>
                 <p className="max-w-sm text-xs text-muted-foreground">
-                  We will never upload your files. Everything stays on-device.
+                  Files never leave your device.
                 </p>
               </div>
             )}
