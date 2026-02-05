@@ -48,7 +48,11 @@ export function App() {
   const [installAvailable, setInstallAvailable] = useState(false);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const stored = localStorage.getItem("darkMode");
+    return stored ? stored === "true" : true;
+  });
   const [canShare, setCanShare] = useState(false);
   const [isIos, setIsIos] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -120,6 +124,7 @@ export function App() {
       root.classList.remove("dark");
       root.classList.add("light");
     }
+    localStorage.setItem("darkMode", String(darkMode));
   }, [darkMode]);
 
   useEffect(() => {
