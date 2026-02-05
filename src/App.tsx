@@ -29,7 +29,8 @@ import {
   createCompressionClient,
 } from "./compressionClient";
 
-const VERSION = "shrinkpic-v1.3.2";
+const VERSION =
+  typeof __APP_VERSION__ !== "undefined" ? `shrinkpic-v${__APP_VERSION__}` : "shrinkpic-v0.0.0";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -62,6 +63,8 @@ export function App() {
   const compressionClientRef = useRef<ReturnType<typeof createCompressionClient> | null>(null);
   const installPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
   const latestRequestIdRef = useRef(0);
+  const debounceTimeoutRef = useRef<number | null>(null);
+  const lastCompressionKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -149,8 +152,30 @@ export function App() {
 
   useEffect(() => {
     if (!currentFile) return;
-    processImage(currentFile);
-  }, [format, compMode]);
+    const maxSizeKB = Math.max(1, Math.round(currentFile.size / 1024));
+    setTargetSizeKB((prev) => Math.min(prev, maxSizeKB));
+  }, [currentFile]);
+
+  useEffect(() => {
+    if (!currentFile) return;
+    const key = `${currentFile.name}-${currentFile.size}-${currentFile.lastModified}-${targetSizeKB}-${format}-${compMode}`;
+    if (key === lastCompressionKeyRef.current) return;
+
+    if (debounceTimeoutRef.current) {
+      window.clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = window.setTimeout(() => {
+      lastCompressionKeyRef.current = key;
+      processImage(currentFile);
+    }, 200);
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        window.clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [currentFile, targetSizeKB, format, compMode]);
 
   useEffect(() => {
     if (!previewUrl) return;
@@ -169,26 +194,35 @@ export function App() {
 
   const handleFile = (file: File) => {
     if (!file || !file.type.startsWith("image/")) return;
+    const maxSizeKB = Math.max(1, Math.round(file.size / 1024));
+    const nextTargetKB = Math.min(targetSizeKB, maxSizeKB);
+    setTargetSizeKB(nextTargetKB);
+    const key = `${file.name}-${file.size}-${file.lastModified}-${nextTargetKB}-${format}-${compMode}`;
+    lastCompressionKeyRef.current = key;
     setCurrentFile(file);
     setCurrentBlob(null);
     setStats(null);
     setIsLoading(true);
-    processImage(file);
+    processImage(file, nextTargetKB);
   };
 
-  const processImage = async (file: File) => {
+  const processImage = async (file: File, targetOverrideKB?: number) => {
     setIsLoading(true);
     const requestId = ++latestRequestIdRef.current;
     try {
-      const result = await compressToSize(file, targetSizeKB * 1024, format, compMode, requestId);
+      const targetKB = targetOverrideKB ?? targetSizeKB;
+      const result = await compressToSize(file, targetKB * 1024, format, compMode, requestId);
       if (requestId !== latestRequestIdRef.current) return;
       setCurrentBlob(result.blob);
       setStats(result);
       setPreviewUrl(URL.createObjectURL(result.blob));
     } catch (error) {
+      if (requestId !== latestRequestIdRef.current) return;
       alert(`Error: ${(error as Error).message}`);
     } finally {
-      setIsLoading(false);
+      if (requestId === latestRequestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -237,6 +271,9 @@ export function App() {
   };
 
   const downloadName = format === "image/png" ? "png" : format === "image/avif" ? "avif" : "jpg";
+  const maxSizeKB = currentFile ? Math.max(1, Math.round(currentFile.size / 1024)) : 500;
+  const minSizeKB = Math.min(20, maxSizeKB);
+  const stepSizeKB = maxSizeKB < 100 ? 1 : 10;
 
   return (
     <div className="relative flex min-h-screen flex-col gap-8 px-4 pb-14 pt-10 md:px-10">
@@ -366,12 +403,11 @@ export function App() {
                 <input
                   id="sizeLimit"
                   type="range"
-                  min={20}
-                  max={500}
-                  step={10}
+                  min={minSizeKB}
+                  max={maxSizeKB}
+                  step={stepSizeKB}
                   value={targetSizeKB}
                   onInput={(event) => setTargetSizeKB(Number((event.target as HTMLInputElement).value))}
-                  onChange={() => currentFile && processImage(currentFile)}
                   className="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted/60 accent-primary"
                 />
               </div>
