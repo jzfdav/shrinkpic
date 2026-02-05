@@ -32,6 +32,22 @@ import {
 const VERSION =
   typeof __APP_VERSION__ !== "undefined" ? `shrinkpic-v${__APP_VERSION__}` : "shrinkpic-v0.0.0";
 
+const safeLocalStorageGet = (key: string) => {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+const safeLocalStorageSet = (key: string, value: string) => {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage errors in private mode or restricted environments.
+  }
+};
+
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
@@ -42,6 +58,7 @@ export function App() {
   const [currentBlob, setCurrentBlob] = useState<Blob | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [targetSizeKB, setTargetSizeKB] = useState(100);
   const [format, setFormat] = useState("image/jpeg");
   const [compMode, setCompMode] = useState<CompressionMode>("quality");
@@ -51,7 +68,7 @@ export function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window === "undefined") return true;
-    const stored = localStorage.getItem("darkMode");
+    const stored = safeLocalStorageGet("darkMode");
     return stored ? stored === "true" : true;
   });
   const [canShare, setCanShare] = useState(false);
@@ -93,7 +110,7 @@ export function App() {
       event.preventDefault();
       installPromptRef.current = event as BeforeInstallPromptEvent;
       setInstallAvailable(true);
-      setShowInstallBanner(!localStorage.getItem("installBannerDismissed"));
+      setShowInstallBanner(!safeLocalStorageGet("installBannerDismissed"));
     };
 
     const handleInstalled = () => {
@@ -127,7 +144,7 @@ export function App() {
       root.classList.remove("dark");
       root.classList.add("light");
     }
-    localStorage.setItem("darkMode", String(darkMode));
+    safeLocalStorageSet("darkMode", String(darkMode));
   }, [darkMode]);
 
   useEffect(() => {
@@ -196,6 +213,7 @@ export function App() {
     if (!file || !file.type.startsWith("image/")) return;
     const maxSizeKB = Math.max(1, Math.round(file.size / 1024));
     const nextTargetKB = Math.min(targetSizeKB, maxSizeKB);
+    setErrorMessage(null);
     setTargetSizeKB(nextTargetKB);
     const key = `${file.name}-${file.size}-${file.lastModified}-${nextTargetKB}-${format}-${compMode}`;
     lastCompressionKeyRef.current = key;
@@ -215,10 +233,11 @@ export function App() {
       if (requestId !== latestRequestIdRef.current) return;
       setCurrentBlob(result.blob);
       setStats(result);
+      setErrorMessage(null);
       setPreviewUrl(URL.createObjectURL(result.blob));
     } catch (error) {
       if (requestId !== latestRequestIdRef.current) return;
-      alert(`Error: ${(error as Error).message}`);
+      setErrorMessage((error as Error).message);
     } finally {
       if (requestId === latestRequestIdRef.current) {
         setIsLoading(false);
@@ -259,7 +278,7 @@ export function App() {
     if (!currentBlob || !navigator.share) return;
     try {
       const extension = format === "image/png" ? "png" : format === "image/avif" ? "avif" : "jpg";
-      const file = new File([currentBlob], `compressed.${extension}`, { type: format });
+      const file = new File([currentBlob], `shrinkpic-image.${extension}`, { type: format });
       await navigator.share({
         files: [file],
         title: "Compressed Image",
@@ -294,7 +313,7 @@ export function App() {
                 size="sm"
                 variant="ghost"
                 onClick={() => {
-                  localStorage.setItem("installBannerDismissed", "true");
+                  safeLocalStorageSet("installBannerDismissed", "true");
                   setShowInstallBanner(false);
                 }}
               >
@@ -362,6 +381,17 @@ export function App() {
               <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
                 <Spinner className="size-6" />
                 <span>Compressing in your browser...</span>
+              </div>
+            ) : errorMessage ? (
+              <div className="flex flex-col items-center gap-3 text-sm">
+                <div className="flex size-14 items-center justify-center rounded-full border border-destructive/40 bg-destructive/10 text-destructive">
+                  <span className="text-lg font-semibold">!</span>
+                </div>
+                <div className="text-sm font-medium text-foreground">Compression failed</div>
+                <p className="max-w-sm text-center text-xs text-muted-foreground">{errorMessage}</p>
+                <Button size="sm" variant="outline" onClick={() => currentFile && processImage(currentFile)}>
+                  Try again
+                </Button>
               </div>
             ) : previewUrl ? (
               <div className="flex w-full flex-col items-center gap-3">
